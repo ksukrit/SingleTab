@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Single Tab Focus</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="popup-body">
+    <main class="popup-shell">
+      <header class="popup-header">
+        <div>
+          <p class="popup-kicker">Single Tab Focus</p>
+          <h2 id="summary">Loading...</h2>
+        </div>
+        <div class="focus-orb" aria-hidden="true">
+          <span id="countedTabs">0</span>
+        </div>
+      </header>
+
+      <section class="focus-card">
+        <div class="focus-card-top">
+          <span id="focusRatio">0 of 3 focus tabs</span>
+          <span id="focusState">Checking</span>
+        </div>
+        <div class="meter popup-meter" aria-hidden="true">
+          <div class="meter-fill" id="meterFill"></div>
+        </div>
+        <p id="detail">Counting your open tabs.</p>
+      </section>
+
+      <section class="stats" aria-label="Tab statistics">
+        <div class="stat">
+          <strong id="focusTabsStat">0</strong>
+          <span>focus tabs</span>
+        </div>
+        <div class="stat">
+          <strong id="maxTabs">3</strong>
+          <span>limit</span>
+        </div>
+        <div class="stat">
+          <strong id="exemptTabs">0</strong>
+          <span>exempt</span>
+        </div>
+      </section>
+
+      <div class="actions popup-actions">
+        <button id="reviewTabs" type="button">Review tabs</button>
+        <button id="allowCurrentSite" class="secondary" type="button">Allow this site</button>
+        <button id="openOptions" class="secondary" type="button">Settings</button>
+      </div>
+      <p class="status compact" id="status" role="status"></p>
+    </main>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

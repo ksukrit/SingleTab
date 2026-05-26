@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Single Tab Focus Settings</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <div class="shell">
+        <section class="card">
+          <p class="eyebrow">Settings</p>
+          <h1>Shape your tab boundary.</h1>
+          <p class="lead">
+            Keep the rule small enough to be useful and flexible enough to avoid fighting your workflow.
+          </p>
+
+          <form class="form-grid" id="settingsForm">
+            <label>
+              Maximum focus tabs
+              <input id="maxTabs" type="number" min="1" max="20" step="1" required>
+            </label>
+
+            <label class="check-row">
+              <input id="ignorePinned" type="checkbox">
+              Ignore pinned tabs
+            </label>
+
+            <label>
+              Allowlist
+              <textarea id="allowlist" spellcheck="false" placeholder="localhost&#10;127.0.0.1&#10;*.work-tools.com"></textarea>
+            </label>
+
+            <p>
+              Use one entry per line. Domains match subdomains, wildcard domains like
+              <strong>*.example.com</strong> are supported, and full URL prefixes like
+              <strong>https://example.com/docs</strong> are allowed.
+            </p>
+
+            <div class="actions">
+              <button type="submit">Save settings</button>
+              <button id="resetDefaults" class="secondary" type="button">Reset defaults</button>
+            </div>
+            <div class="status" id="status" role="status"></div>
+          </form>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>
