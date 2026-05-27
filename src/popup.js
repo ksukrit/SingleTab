@@ -67,26 +67,43 @@ async function render() {
   const limit = state.settings.maxTabs;
   const percent = Math.min(100, Math.round((used / limit) * 100));
   const isPaused = state.focusPause?.isPaused;
+  const isOutsideSchedule = state.enforcement?.reason === "outside_schedule";
 
   summary.textContent = isPaused
     ? "Focus is disabled"
+    : isOutsideSchedule
+    ? "Outside focus hours"
     : used <= limit
     ? "Focused and contained"
     : "A little overloaded";
   detail.textContent = isPaused
     ? `Tab limit enforcement resumes at ${formatTime(state.focusPause.pausedUntil)}.`
+    : isOutsideSchedule
+    ? getScheduleDetail(state.enforcement.schedule)
     : used <= limit
     ? "Pinned and allowed sites stay outside your focus tabs."
     : "Close or exempt a tab to reduce context switching.";
   countedTabs.textContent = used;
   focusTabsStat.textContent = used;
   focusRatio.textContent = `${used} of ${limit} focus tabs`;
-  focusState.textContent = isPaused ? "Paused" : used <= limit ? "On track" : `${used - limit} over`;
-  focusState.classList.toggle("is-over", !isPaused && used > limit);
+  focusState.textContent = isPaused
+    ? "Paused"
+    : isOutsideSchedule
+    ? "Scheduled"
+    : used <= limit
+    ? "On track"
+    : `${used - limit} over`;
+  focusState.classList.toggle("is-over", !isPaused && !isOutsideSchedule && used > limit);
   maxTabs.textContent = limit;
   exemptTabs.textContent = state.exemptTabs.length;
   meterFill.style.width = `${percent}%`;
-  meterFill.classList.toggle("is-over", !isPaused && used > limit);
+  meterFill.classList.toggle("is-over", !isPaused && !isOutsideSchedule && used > limit);
+}
+
+function getScheduleDetail(schedule) {
+  return schedule?.nextLabel
+    ? `Enforcement starts ${schedule.nextLabel}.`
+    : "Scheduled enforcement is off right now.";
 }
 
 function formatTime(timestamp) {

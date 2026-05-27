@@ -1,6 +1,7 @@
 import {
   clearTemporaryAllowance,
   clearFocusPause,
+  getEnforcementState,
   getFocusPageUrl,
   getFocusPause,
   getFocusState,
@@ -88,7 +89,7 @@ async function enforceTabLimit(tabId, knownTab) {
       chrome.tabs.query({ windowType: "normal" })
     ]);
 
-    if (focusPause.isPaused) {
+    if (!getEnforcementState(settings, focusPause).isActive) {
       return true;
     }
 

@@ -12,7 +12,9 @@ A calm Manifest V3 Chrome extension that nudges you back to focus by limiting th
 - Does not interrupt navigation inside tabs that were already open.
 - Lets you close tabs, allow a blocked URL once, or adjust settings.
 - Requires a configurable breathing intervention before a blocked URL can be allowed once.
+- Lets you choose between breathing, reflection, and typing interventions.
 - Lets you customize the intervention wait time and prompt text.
+- Supports scheduled enforcement windows.
 - Lets you temporarily disable enforcement for 15 minutes from settings.
 - Lets you add the current site to the allowlist from the popup.
 

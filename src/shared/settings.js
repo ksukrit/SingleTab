@@ -1,10 +1,26 @@
 export const DEFAULT_SETTINGS = {
   maxTabs: 3,
   ignorePinned: true,
+  scheduleEnabled: false,
+  scheduleStart: "09:00",
+  scheduleEnd: "17:00",
+  scheduleDays: [1, 2, 3, 4, 5],
+  interventionType: "breathing",
   interventionSeconds: 12,
   interventionText: "Take one breath. Stop doom scrolling and ask: is this tab helping the thing you meant to do?",
   allowlist: []
 };
+
+export const INTERVENTION_TYPES = ["breathing", "reflection", "typing"];
+export const WEEK_DAYS = [
+  { value: 0, label: "Sun" },
+  { value: 1, label: "Mon" },
+  { value: 2, label: "Tue" },
+  { value: 3, label: "Wed" },
+  { value: 4, label: "Thu" },
+  { value: 5, label: "Fri" },
+  { value: 6, label: "Sat" }
+];
 
 export const FOCUS_PAGE = "src/focus.html";
 
@@ -31,6 +47,11 @@ export function normalizeSettings(settings) {
   return {
     maxTabs: clampInteger(settings.maxTabs, 1, 20, DEFAULT_SETTINGS.maxTabs),
     ignorePinned: settings.ignorePinned !== false,
+    scheduleEnabled: settings.scheduleEnabled === true,
+    scheduleStart: normalizeTime(settings.scheduleStart, DEFAULT_SETTINGS.scheduleStart),
+    scheduleEnd: normalizeTime(settings.scheduleEnd, DEFAULT_SETTINGS.scheduleEnd),
+    scheduleDays: normalizeScheduleDays(settings.scheduleDays),
+    interventionType: normalizeInterventionType(settings.interventionType),
     interventionSeconds: clampInteger(
       settings.interventionSeconds,
       3,
@@ -42,9 +63,31 @@ export function normalizeSettings(settings) {
   };
 }
 
+function normalizeInterventionType(value) {
+  return INTERVENTION_TYPES.includes(value) ? value : DEFAULT_SETTINGS.interventionType;
+}
+
 function normalizeInterventionText(value) {
   const text = String(value || "").trim();
   return text || DEFAULT_SETTINGS.interventionText;
+}
+
+function normalizeTime(value, fallback) {
+  const text = String(value || "");
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(text) ? text : fallback;
+}
+
+function normalizeScheduleDays(days) {
+  if (!Array.isArray(days)) {
+    return DEFAULT_SETTINGS.scheduleDays;
+  }
+
+  const normalized = [...new Set(days
+    .map((day) => clampInteger(day, 0, 6, -1))
+    .filter((day) => day >= 0))]
+    .sort((a, b) => a - b);
+
+  return normalized.length ? normalized : DEFAULT_SETTINGS.scheduleDays;
 }
 
 export function normalizeAllowlist(entries) {
@@ -204,11 +247,98 @@ export async function getFocusState() {
   return {
     settings,
     focusPause,
+    enforcement: getEnforcementState(settings, focusPause),
     tabs,
     countedTabs,
     exemptTabs,
     overLimit: Math.max(0, countedTabs.length - settings.maxTabs)
   };
+}
+
+export function getEnforcementState(settings, focusPause = { isPaused: false }) {
+  const schedule = getScheduleState(settings);
+
+  if (focusPause.isPaused) {
+    return {
+      isActive: false,
+      reason: "paused",
+      schedule
+    };
+  }
+
+  if (!schedule.isActive) {
+    return {
+      isActive: false,
+      reason: "outside_schedule",
+      schedule
+    };
+  }
+
+  return {
+    isActive: true,
+    reason: "active",
+    schedule
+  };
+}
+
+export function getScheduleState(settings, date = new Date()) {
+  if (!settings.scheduleEnabled) {
+    return {
+      isActive: true,
+      nextLabel: "",
+      summary: "Always active"
+    };
+  }
+
+  const startMinutes = timeToMinutes(settings.scheduleStart);
+  const endMinutes = timeToMinutes(settings.scheduleEnd);
+  const currentMinutes = date.getHours() * 60 + date.getMinutes();
+  const today = date.getDay();
+  const yesterday = (today + 6) % 7;
+  const isOvernight = startMinutes > endMinutes;
+  const isAllDay = startMinutes === endMinutes;
+  const activeToday = settings.scheduleDays.includes(today);
+  const activeYesterday = settings.scheduleDays.includes(yesterday);
+  const isActive = isAllDay
+    ? activeToday
+    : isOvernight
+    ? (activeToday && currentMinutes >= startMinutes) ||
+      (activeYesterday && currentMinutes < endMinutes)
+    : activeToday && currentMinutes >= startMinutes && currentMinutes < endMinutes;
+
+  return {
+    isActive,
+    nextLabel: getNextScheduleLabel(settings, date),
+    summary: isAllDay ? "All day" : `${settings.scheduleStart} to ${settings.scheduleEnd}`
+  };
+}
+
+function getNextScheduleLabel(settings, date) {
+  const startMinutes = timeToMinutes(settings.scheduleStart);
+  const currentMinutes = date.getHours() * 60 + date.getMinutes();
+
+  for (let offset = 0; offset < 7; offset += 1) {
+    const day = (date.getDay() + offset) % 7;
+    if (!settings.scheduleDays.includes(day)) {
+      continue;
+    }
+
+    if (offset === 0 && currentMinutes >= startMinutes) {
+      continue;
+    }
+
+    const dayLabel = offset === 0
+      ? "today"
+      : WEEK_DAYS.find((item) => item.value === day)?.label || "";
+    return `${dayLabel} at ${settings.scheduleStart}`;
+  }
+
+  return "";
+}
+
+function timeToMinutes(value) {
+  const [hours, minutes] = value.split(":").map((part) => Number.parseInt(part, 10));
+  return hours * 60 + minutes;
 }
 
 function clampInteger(value, min, max, fallback) {

@@ -17,47 +17,150 @@
           </p>
 
           <form class="form-grid" id="settingsForm">
-            <label>
-              Maximum focus tabs
-              <input id="maxTabs" type="number" min="1" max="20" step="1" required>
-            </label>
-
-            <label class="check-row">
-              <input id="ignorePinned" type="checkbox">
-              Ignore pinned tabs
-            </label>
-
-            <section class="settings-panel" aria-labelledby="pauseTitle">
-              <div>
-                <h2 id="pauseTitle">Temporary disable</h2>
-                <p id="pauseStatus">Tab limit enforcement is active.</p>
+            <section class="form-section" aria-labelledby="boundaryTitle">
+              <div class="section-heading">
+                <p class="eyebrow">Boundary</p>
+                <h2 id="boundaryTitle">Tab limit</h2>
+                <p>Set which tabs count before a new tab is interrupted.</p>
               </div>
-              <div class="inline-actions">
-                <button id="pauseFocus" class="secondary" type="button">Disable for 15 minutes</button>
-                <button id="resumeFocus" class="secondary" type="button" hidden>Resume now</button>
+              <div class="setting-grid">
+                <label>
+                  Maximum focus tabs
+                  <input id="maxTabs" type="number" min="1" max="20" step="1" required>
+                </label>
+
+                <label class="check-row">
+                  <input id="ignorePinned" type="checkbox">
+                  Ignore pinned tabs
+                </label>
               </div>
             </section>
 
-            <label>
-              Intervention wait
-              <input id="interventionSeconds" type="number" min="3" max="120" step="1" required>
-            </label>
+            <section class="form-section" aria-labelledby="pauseTitle">
+              <div class="section-heading">
+                <p class="eyebrow">Pause</p>
+                <h2 id="pauseTitle">Temporary disable</h2>
+                <p id="pauseStatus">Tab limit enforcement is active.</p>
+              </div>
+              <div class="settings-panel">
+                <div>
+                  <strong>Take a short break from enforcement</strong>
+                  <p>Useful when you need extra tabs for a short task.</p>
+                </div>
+                <div class="inline-actions">
+                  <button id="pauseFocus" class="secondary" type="button">Disable for 15 minutes</button>
+                  <button id="resumeFocus" class="secondary" type="button" hidden>Resume now</button>
+                </div>
+              </div>
+            </section>
 
-            <label>
-              Intervention text
-              <textarea id="interventionText" class="short-textarea" maxlength="180" placeholder="Take one breath. Stop doom scrolling and ask: is this tab helping the thing you meant to do?"></textarea>
-            </label>
+            <section class="form-section" aria-labelledby="interventionTitle">
+              <div class="section-heading">
+                <p class="eyebrow">Intervention</p>
+                <h2 id="interventionTitle">Pause experience</h2>
+                <p>Choose what someone sees before continuing to a blocked tab.</p>
+              </div>
+              <div class="setting-grid">
+                <label>
+                  Wait time
+                  <input id="interventionSeconds" type="number" min="3" max="120" step="1" required>
+                </label>
+              </div>
 
-            <label>
-              Allowlist
-              <textarea id="allowlist" spellcheck="false" placeholder="localhost&#10;127.0.0.1&#10;*.work-tools.com"></textarea>
-            </label>
+              <fieldset class="intervention-picker">
+                <legend>Style</legend>
+                <label class="intervention-option" data-intervention-option="breathing">
+                  <input name="interventionType" type="radio" value="breathing">
+                  <span class="option-copy">
+                    <strong>Breathing</strong>
+                    <span>Animated inhale and exhale pause.</span>
+                  </span>
+                  <span class="preview preview-breathing" aria-hidden="true">
+                    <span>Breathe in</span>
+                  </span>
+                </label>
+                <label class="intervention-option" data-intervention-option="reflection">
+                  <input name="interventionType" type="radio" value="reflection">
+                  <span class="option-copy">
+                    <strong>Reflection</strong>
+                    <span>Write why this tab matters before opening.</span>
+                  </span>
+                  <span class="preview preview-reflection" aria-hidden="true">
+                    <span>Why now?</span>
+                    <span></span>
+                  </span>
+                </label>
+                <label class="intervention-option" data-intervention-option="typing">
+                  <input name="interventionType" type="radio" value="typing">
+                  <span class="option-copy">
+                    <strong>Typing</strong>
+                    <span>Type a short phrase to make the choice deliberate.</span>
+                  </span>
+                  <span class="preview preview-typing" aria-hidden="true">
+                    <span>I choose this tab</span>
+                  </span>
+                </label>
+              </fieldset>
 
-            <p>
-              Use one entry per line. Domains match subdomains, wildcard domains like
-              <strong>*.example.com</strong> are supported, and full URL prefixes like
-              <strong>https://example.com/docs</strong> are allowed.
-            </p>
+              <label>
+                Prompt text
+                <textarea id="interventionText" class="short-textarea" maxlength="180" placeholder="Take one breath. Stop doom scrolling and ask: is this tab helping the thing you meant to do?"></textarea>
+              </label>
+            </section>
+
+            <section class="form-section" aria-labelledby="scheduleTitle">
+              <div class="section-heading">
+                <p class="eyebrow">Schedule</p>
+                <h2 id="scheduleTitle">Enforcement windows</h2>
+                <p id="scheduleStatus">Enforcement is always active.</p>
+              </div>
+              <div class="settings-panel schedule-panel">
+                <div class="settings-panel-header">
+                  <label class="switch-row">
+                    <input id="scheduleEnabled" type="checkbox">
+                    Use schedule
+                  </label>
+                </div>
+                <div class="schedule-controls" id="scheduleControls">
+                  <label>
+                    Start
+                    <input id="scheduleStart" type="time" required>
+                  </label>
+                  <label>
+                    End
+                    <input id="scheduleEnd" type="time" required>
+                  </label>
+                  <fieldset class="day-picker">
+                    <legend>Days</legend>
+                    <label><input name="scheduleDays" type="checkbox" value="1"> Mon</label>
+                    <label><input name="scheduleDays" type="checkbox" value="2"> Tue</label>
+                    <label><input name="scheduleDays" type="checkbox" value="3"> Wed</label>
+                    <label><input name="scheduleDays" type="checkbox" value="4"> Thu</label>
+                    <label><input name="scheduleDays" type="checkbox" value="5"> Fri</label>
+                    <label><input name="scheduleDays" type="checkbox" value="6"> Sat</label>
+                    <label><input name="scheduleDays" type="checkbox" value="0"> Sun</label>
+                  </fieldset>
+                </div>
+              </div>
+            </section>
+
+            <section class="form-section" aria-labelledby="allowlistTitle">
+              <div class="section-heading">
+                <p class="eyebrow">Exceptions</p>
+                <h2 id="allowlistTitle">Allowlist</h2>
+                <p>Domains and URL prefixes here never count toward the focus tab limit.</p>
+              </div>
+              <label>
+                Allowed sites
+                <textarea id="allowlist" spellcheck="false" placeholder="localhost&#10;127.0.0.1&#10;*.work-tools.com"></textarea>
+              </label>
+
+              <p class="help-text">
+                Use one entry per line. Domains match subdomains, wildcard domains like
+                <strong>*.example.com</strong> are supported, and full URL prefixes like
+                <strong>https://example.com/docs</strong> are allowed.
+              </p>
+            </section>
 
             <div class="actions">
               <button type="submit">Save settings</button>

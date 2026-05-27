@@ -11,12 +11,12 @@
       <div class="shell">
         <section class="card">
           <p class="eyebrow">Gentle boundary</p>
-          <h1>Too many open loops.</h1>
+          <h1 id="pageTitle">Pause for a breath.</h1>
           <p class="lead" id="message">
-            This tab was paused because your browser is already carrying enough context.
+            See what currently counts toward your focus limit.
           </p>
 
-          <div class="stats" aria-label="Tab statistics">
+          <div class="stats" id="focusStats" aria-label="Tab statistics">
             <div class="stat">
               <strong id="countedTabs">0</strong>
               <span>focus tabs</span>
@@ -31,7 +31,7 @@
             </div>
           </div>
 
-          <div class="meter" aria-hidden="true">
+          <div class="meter" id="focusMeter" aria-hidden="true">
             <div class="meter-fill" id="meterFill"></div>
           </div>
 
@@ -47,6 +47,7 @@
               <p class="intervention-timer" id="interventionTimer" role="status">
                 Start the pause when you are ready.
               </p>
+              <div class="intervention-extra" id="interventionExtra"></div>
             </div>
           </div>
 
@@ -57,9 +58,9 @@
           </div>
         </section>
 
-        <section class="card">
-          <h2>Open focus tabs</h2>
-          <p>Close one thing you do not need right now, then continue with the task at hand.</p>
+        <section class="card" id="tabListCard">
+          <h2 id="tabListTitle">Open focus tabs</h2>
+          <p id="tabListIntro">Review the tabs currently counted by your focus boundary.</p>
           <div class="tab-list" id="tabList"></div>
         </section>
       </div>
