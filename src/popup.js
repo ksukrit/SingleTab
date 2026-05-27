@@ -66,22 +66,34 @@ async function render() {
   const used = state.countedTabs.length;
   const limit = state.settings.maxTabs;
   const percent = Math.min(100, Math.round((used / limit) * 100));
+  const isPaused = state.focusPause?.isPaused;
 
-  summary.textContent = used <= limit
+  summary.textContent = isPaused
+    ? "Focus is disabled"
+    : used <= limit
     ? "Focused and contained"
     : "A little overloaded";
-  detail.textContent = used <= limit
+  detail.textContent = isPaused
+    ? `Tab limit enforcement resumes at ${formatTime(state.focusPause.pausedUntil)}.`
+    : used <= limit
     ? "Pinned and allowed sites stay outside your focus tabs."
     : "Close or exempt a tab to reduce context switching.";
   countedTabs.textContent = used;
   focusTabsStat.textContent = used;
   focusRatio.textContent = `${used} of ${limit} focus tabs`;
-  focusState.textContent = used <= limit ? "On track" : `${used - limit} over`;
-  focusState.classList.toggle("is-over", used > limit);
+  focusState.textContent = isPaused ? "Paused" : used <= limit ? "On track" : `${used - limit} over`;
+  focusState.classList.toggle("is-over", !isPaused && used > limit);
   maxTabs.textContent = limit;
   exemptTabs.textContent = state.exemptTabs.length;
   meterFill.style.width = `${percent}%`;
-  meterFill.classList.toggle("is-over", used > limit);
+  meterFill.classList.toggle("is-over", !isPaused && used > limit);
+}
+
+function formatTime(timestamp) {
+  return new Intl.DateTimeFormat([], {
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(new Date(timestamp));
 }
 
 function flashStatus(message) {

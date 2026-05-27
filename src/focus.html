@@ -35,9 +35,24 @@
             <div class="meter-fill" id="meterFill"></div>
           </div>
 
+          <div class="intervention" id="intervention" hidden>
+            <div class="breath-orb" aria-hidden="true">
+              <span id="breathPhase">Breathe in</span>
+            </div>
+            <div class="intervention-copy">
+              <p class="eyebrow">Pause before opening</p>
+              <p id="interventionText">
+                Take one breath. Stop doom scrolling and ask: is this tab helping the thing you meant to do?
+              </p>
+              <p class="intervention-timer" id="interventionTimer" role="status">
+                Start the pause when you are ready.
+              </p>
+            </div>
+          </div>
+
           <div class="actions">
             <button id="closeThisTab" class="danger" type="button">Close this tab</button>
-            <button id="allowOnce" type="button">Allow once</button>
+            <button id="allowOnce" type="button" disabled>Preparing pause...</button>
             <button id="openOptions" class="secondary" type="button">Settings</button>
           </div>
         </section>

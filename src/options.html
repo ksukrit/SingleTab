@@ -27,6 +27,27 @@
               Ignore pinned tabs
             </label>
 
+            <section class="settings-panel" aria-labelledby="pauseTitle">
+              <div>
+                <h2 id="pauseTitle">Temporary disable</h2>
+                <p id="pauseStatus">Tab limit enforcement is active.</p>
+              </div>
+              <div class="inline-actions">
+                <button id="pauseFocus" class="secondary" type="button">Disable for 15 minutes</button>
+                <button id="resumeFocus" class="secondary" type="button" hidden>Resume now</button>
+              </div>
+            </section>
+
+            <label>
+              Intervention wait
+              <input id="interventionSeconds" type="number" min="3" max="120" step="1" required>
+            </label>
+
+            <label>
+              Intervention text
+              <textarea id="interventionText" class="short-textarea" maxlength="180" placeholder="Take one breath. Stop doom scrolling and ask: is this tab helping the thing you meant to do?"></textarea>
+            </label>
+
             <label>
               Allowlist
               <textarea id="allowlist" spellcheck="false" placeholder="localhost&#10;127.0.0.1&#10;*.work-tools.com"></textarea>

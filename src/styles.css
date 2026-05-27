@@ -76,6 +76,12 @@ button:hover,
   filter: brightness(0.96);
 }
 
+button:disabled {
+  cursor: wait;
+  filter: saturate(0.72);
+  opacity: 0.72;
+}
+
 main {
   padding: 22px;
 }
@@ -297,6 +303,117 @@ p {
   margin-top: 22px;
 }
 
+.inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.settings-panel {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 14px;
+}
+
+.settings-panel h2,
+.settings-panel p {
+  margin: 0;
+}
+
+.settings-panel h2 {
+  font-size: 1rem;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+.settings-panel p {
+  font-size: 0.92rem;
+  margin-top: 4px;
+}
+
+.intervention {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin-top: 22px;
+  padding: 16px;
+}
+
+.intervention[hidden] {
+  display: none;
+}
+
+.breath-orb {
+  align-items: center;
+  aspect-ratio: 1;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.86), transparent 2rem),
+    linear-gradient(145deg, #d5e3cd, #7ea994);
+  border: 1px solid rgba(47, 111, 94, 0.22);
+  border-radius: 50%;
+  box-shadow: inset 0 -18px 34px rgba(33, 78, 66, 0.12);
+  color: var(--accent-strong);
+  display: grid;
+  font-size: 0.88rem;
+  font-weight: 900;
+  height: 118px;
+  justify-items: center;
+  text-align: center;
+  transform: scale(0.82);
+  transition:
+    background 260ms ease,
+    transform 4s ease-in-out;
+}
+
+.intervention.is-inhale .breath-orb {
+  transform: scale(1);
+}
+
+.intervention.is-exhale .breath-orb {
+  transform: scale(0.82);
+}
+
+.intervention.is-ready .breath-orb {
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.9), transparent 2rem),
+    linear-gradient(145deg, #d9dfb2, #85a878);
+  transform: scale(0.92);
+}
+
+.intervention-copy {
+  min-width: 0;
+}
+
+.intervention-copy .eyebrow,
+.intervention-copy p {
+  margin: 0;
+}
+
+.intervention-copy .eyebrow {
+  margin-bottom: 6px;
+}
+
+#interventionText {
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.intervention-timer {
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
 .popup-actions {
   display: grid;
   gap: 8px;
@@ -383,6 +500,10 @@ textarea {
   resize: vertical;
 }
 
+textarea.short-textarea {
+  min-height: 96px;
+}
+
 .check-row {
   align-items: center;
   display: flex;
@@ -419,9 +540,15 @@ textarea {
 }
 
 @media (max-width: 620px) {
+  .intervention,
+  .settings-panel,
   .stats,
   .tab-row {
     grid-template-columns: 1fr;
+  }
+
+  .breath-orb {
+    height: 96px;
   }
 
   .page {
@@ -431,5 +558,11 @@ textarea {
   .card {
     border-radius: 20px;
     padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .breath-orb {
+    transition: background 260ms ease;
   }
 }

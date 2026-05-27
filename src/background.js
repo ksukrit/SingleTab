@@ -1,11 +1,14 @@
 import {
   clearTemporaryAllowance,
+  clearFocusPause,
   getFocusPageUrl,
+  getFocusPause,
   getFocusState,
   getSettings,
   getTemporaryAllowances,
   isInternalUrl,
   isCountedTab,
+  pauseFocusForMinutes,
   setTemporaryAllowance
 } from "./shared/settings.js";
 
@@ -77,12 +80,17 @@ async function enforceTabLimit(tabId, knownTab) {
   enforcingTabs.add(tabId);
 
   try {
-    const [settings, temporaryAllowances, targetTab, allTabs] = await Promise.all([
+    const [settings, temporaryAllowances, focusPause, targetTab, allTabs] = await Promise.all([
       getSettings(),
       getTemporaryAllowances(),
+      getFocusPause(),
       knownTab?.url ? Promise.resolve(knownTab) : chrome.tabs.get(tabId).catch(() => null),
       chrome.tabs.query({ windowType: "normal" })
     ]);
+
+    if (focusPause.isPaused) {
+      return true;
+    }
 
     if (!targetTab) {
       return true;
@@ -137,6 +145,15 @@ async function handleMessage(message, sender) {
       await chrome.tabs.update(tabId, { url: message.url });
       return { ok: true };
     }
+    case "pauseFocus":
+      return {
+        ok: true,
+        focusPause: await pauseFocusForMinutes(15),
+        state: await getFocusState()
+      };
+    case "resumeFocus":
+      await clearFocusPause();
+      return { ok: true, state: await getFocusState() };
     case "openOptions":
       await chrome.runtime.openOptionsPage();
       return { ok: true };

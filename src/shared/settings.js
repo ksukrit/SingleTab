@@ -1,6 +1,8 @@
 export const DEFAULT_SETTINGS = {
   maxTabs: 3,
   ignorePinned: true,
+  interventionSeconds: 12,
+  interventionText: "Take one breath. Stop doom scrolling and ask: is this tab helping the thing you meant to do?",
   allowlist: []
 };
 
@@ -29,8 +31,20 @@ export function normalizeSettings(settings) {
   return {
     maxTabs: clampInteger(settings.maxTabs, 1, 20, DEFAULT_SETTINGS.maxTabs),
     ignorePinned: settings.ignorePinned !== false,
+    interventionSeconds: clampInteger(
+      settings.interventionSeconds,
+      3,
+      120,
+      DEFAULT_SETTINGS.interventionSeconds
+    ),
+    interventionText: normalizeInterventionText(settings.interventionText),
     allowlist: normalizeAllowlist(settings.allowlist)
   };
+}
+
+function normalizeInterventionText(value) {
+  const text = String(value || "").trim();
+  return text || DEFAULT_SETTINGS.interventionText;
 }
 
 export function normalizeAllowlist(entries) {
@@ -132,6 +146,31 @@ export async function getTemporaryAllowances() {
   return pruneTemporaryAllowances(temporaryAllowances);
 }
 
+export async function getFocusPause() {
+  const { focusPausedUntil = 0 } = await chrome.storage.session.get({
+    focusPausedUntil: 0
+  });
+  const pausedUntil = Number(focusPausedUntil) || 0;
+
+  if (pausedUntil <= Date.now()) {
+    await clearFocusPause();
+    return { isPaused: false, pausedUntil: 0 };
+  }
+
+  return { isPaused: true, pausedUntil };
+}
+
+export async function pauseFocusForMinutes(minutes = 15) {
+  const durationMs = clampInteger(minutes, 1, 240, 15) * 60 * 1000;
+  const focusPausedUntil = Date.now() + durationMs;
+  await chrome.storage.session.set({ focusPausedUntil });
+  return getFocusPause();
+}
+
+export async function clearFocusPause() {
+  await chrome.storage.session.remove("focusPausedUntil");
+}
+
 export async function setTemporaryAllowance(tabId, url) {
   const temporaryAllowances = await getTemporaryAllowances();
   temporaryAllowances[String(tabId)] = {
@@ -148,9 +187,10 @@ export async function clearTemporaryAllowance(tabId) {
 }
 
 export async function getFocusState() {
-  const [settings, temporaryAllowances, tabs] = await Promise.all([
+  const [settings, temporaryAllowances, focusPause, tabs] = await Promise.all([
     getSettings(),
     getTemporaryAllowances(),
+    getFocusPause(),
     chrome.tabs.query({ windowType: "normal" })
   ]);
 
@@ -163,6 +203,7 @@ export async function getFocusState() {
 
   return {
     settings,
+    focusPause,
     tabs,
     countedTabs,
     exemptTabs,
